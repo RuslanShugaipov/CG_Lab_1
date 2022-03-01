@@ -27,7 +27,7 @@ namespace Lab_1
 
         private void button1_Click(object sender, EventArgs e)
         {
-
+        
         }
 
         private void button2_Click_1(object sender, EventArgs e)
@@ -35,40 +35,66 @@ namespace Lab_1
 
         }
 
-        private void Form1_Paint(object sender, PaintEventArgs e)
+        private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
-            Graphics graphics = e.Graphics;
-            Pen pen = new Pen(Color.Black);
-            Brush brush = new SolidBrush(Color.Coral);
-
-            graphics.DrawLine(pen, 2, 2, 400, 450);
+            Cube cube = new Cube(50.0f, new int[]{ pictureBox1.Width / 2, pictureBox1.Height / 2 });
+            Pen pen = new Pen(Brushes.Red);
+            cube.Draw(e.Graphics, pen);
         }
     }
 
     class Cube
     {
-        public Cube(float side)
+        public Cube(float side, int[] centerPoint)
         {
             this.side = side;
+            this.centerPoint = centerPoint;
             vertecies = new Matrix[]
             {
-                new Matrix(new float[1, 3] { { -1.0f * side, -1.0f * side,  1.0f * side } }),
-                new Matrix(new float[1, 3] { {  1.0f * side, -1.0f * side,  1.0f  * side} }),
-                new Matrix(new float[1, 3] { {  1.0f * side,  1.0f * side,  1.0f  * side} }),
-                new Matrix(new float[1, 3] { { -1.0f * side,  1.0f * side,  1.0f  * side} }),
-                new Matrix(new float[1, 3] { { -1.0f * side, -1.0f * side, -1.0f  * side} }),
-                new Matrix(new float[1, 3] { {  1.0f * side, -1.0f * side, -1.0f  * side} }),
-                new Matrix(new float[1, 3] { {  1.0f * side,  1.0f * side, -1.0f  * side} }),
-                new Matrix(new float[1, 3] { { -1.0f * side,  1.0f * side, -1.0f  * side} })
+                new Matrix(new float[1, 3] { { centerPoint[0] - side / 2, centerPoint[1] - side / 2,  1.0f  * side} }),
+                new Matrix(new float[1, 3] { { centerPoint[0] + side / 2, centerPoint[1] - side / 2,  1.0f  * side} }),
+                new Matrix(new float[1, 3] { { centerPoint[0] + side / 2, centerPoint[1] + side / 2,  1.0f  * side} }),
+                new Matrix(new float[1, 3] { { centerPoint[0] - side / 2, centerPoint[1] + side / 2,  1.0f  * side} }),
+                new Matrix(new float[1, 3] { { centerPoint[0] - side / 2, centerPoint[1] - side / 2, -1.0f  * side} }),
+                new Matrix(new float[1, 3] { { centerPoint[0] + side / 2, centerPoint[1] - side / 2, -1.0f  * side} }),
+                new Matrix(new float[1, 3] { { centerPoint[0] + side / 2, centerPoint[1] + side / 2, -1.0f  * side} }),
+                new Matrix(new float[1, 3] { { centerPoint[0] - side / 2, centerPoint[1] + side / 2, -1.0f  * side} })
             };
-    }
-        private float side = 1;
+
+        }
+
+        public void Draw(Graphics graphics, Pen pen)
+        {
+            for (int i = 0; i < 7; i += 2)
+            {
+                graphics.DrawLine(pen, vertecies[indicies[0, i]][0, 0], vertecies[indicies[0, i]][0, 1],
+                    vertecies[indicies[0, i + 1]][0, 0], vertecies[indicies[0, i + 1]][0, 1]);
+            }
+        }
+
+        private int[,] indicies =
+        {
+            //Front face
+            {0, 1, 1, 2, 2, 3, 3, 0 },
+            //Back face
+            //{4, 5, 6, 7 },
+            ////Top face
+            //{3, 2, 6, 7 },
+            ////Bottom face
+            //{0, 1, 5, 4 },
+            ////Right face
+            //{1, 5, 6, 2 },
+            ////Left face
+            //{0, 4, 7, 3 }
+        };
+        private float side;
         public float Side
         {
             get { return side; }
             set { this.side = value; }
         }
         private Matrix[] vertecies;
+        private int[] centerPoint;
     }
 
     public class Matrix
@@ -103,8 +129,8 @@ namespace Lab_1
 
         public float this[int x, int y]
         {
-            get { return this.data[x, y]; }
-            set { this.data[x, y] = value; }
+            get { return data[x, y]; }
+            set { data[x, y] = value; }
         }
 
         public static Matrix operator *(Matrix matrixA, Matrix matrixB)
