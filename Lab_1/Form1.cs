@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Numerics
+using System.Numerics;
 
 namespace Lab_1
 {
@@ -47,17 +47,28 @@ namespace Lab_1
 
     class Cube
     {
-        Matrix[] vertecies =
+        public Cube(float side)
         {
-            new Matrix(1, 3, new float[] { -1.0f, -1.0f,  1.0f}),
-            new Matrix(1, 3, new float[] {  1.0f, -1.0f,  1.0f}),
-            new Matrix(1, 3, new float[] {  1.0f,  1.0f,  1.0f}),
-            new Matrix(1, 3, new float[] { -1.0f,  1.0f,  1.0f}),
-            new Matrix(1, 3, new float[] { -1.0f, -1.0f, -1.0f}),
-            new Matrix(1, 3, new float[] {  1.0f, -1.0f, -1.0f}),
-            new Matrix(1, 3, new float[] {  1.0f,  1.0f, -1.0f}),
-            new Matrix(1, 3, new float[] { -1.0f,  1.0f, -1.0f}),
-        };
+            this.side = side;
+            vertecies = new Matrix[]
+            {
+                new Matrix(new float[1, 3] { { -1.0f * side, -1.0f * side,  1.0f * side } }),
+                new Matrix(new float[1, 3] { {  1.0f * side, -1.0f * side,  1.0f  * side} }),
+                new Matrix(new float[1, 3] { {  1.0f * side,  1.0f * side,  1.0f  * side} }),
+                new Matrix(new float[1, 3] { { -1.0f * side,  1.0f * side,  1.0f  * side} }),
+                new Matrix(new float[1, 3] { { -1.0f * side, -1.0f * side, -1.0f  * side} }),
+                new Matrix(new float[1, 3] { {  1.0f * side, -1.0f * side, -1.0f  * side} }),
+                new Matrix(new float[1, 3] { {  1.0f * side,  1.0f * side, -1.0f  * side} }),
+                new Matrix(new float[1, 3] { { -1.0f * side,  1.0f * side, -1.0f  * side} })
+            };
+    }
+        private float side = 1;
+        public float Side
+        {
+            get { return side; }
+            set { this.side = value; }
+        }
+        private Matrix[] vertecies;
     }
 
     public class Matrix
@@ -76,23 +87,24 @@ namespace Lab_1
             get { return n; }
         }
 
-        public Matrix(int m, int n, float[] data)
+        public Matrix(float[,] data)
+        {
+            this.m = data.GetUpperBound(0) + 1;
+            this.n = data.Length;
+            this.data = data;
+        }
+
+        public Matrix(int m, int n)
         {
             this.m = m;
             this.n = n;
-            this.data = data;
+            this.data = new float[m, n];
         }
 
         public float this[int x, int y]
         {
-            get
-            {
-                return this.data[x, y];
-            }
-            set
-            {
-                this.data[x, y] = value;
-            }
+            get { return this.data[x, y]; }
+            set { this.data[x, y] = value; }
         }
 
         public static Matrix operator *(Matrix matrixA, Matrix matrixB)
