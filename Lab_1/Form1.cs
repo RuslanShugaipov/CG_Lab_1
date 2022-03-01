@@ -16,8 +16,8 @@ namespace Lab_1
         public Form1()
         {
             InitializeComponent();
-            this.Width = 500;
-            this.Height = 500;
+            Width = 500;
+            Height = 500;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -27,7 +27,7 @@ namespace Lab_1
 
         private void button1_Click(object sender, EventArgs e)
         {
-        
+
         }
 
         private void button2_Click_1(object sender, EventArgs e)
@@ -37,8 +37,10 @@ namespace Lab_1
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
-            Cube cube = new Cube(50.0f, new int[]{ pictureBox1.Width / 2, pictureBox1.Height / 2 });
+            Cube cube = new Cube(50.0f, new int[] { pictureBox1.Width / 2, pictureBox1.Height / 2, 0 });
             Pen pen = new Pen(Brushes.Red);
+            //cube.rotationZ(45.0);
+            cube.translation(-100.0f,100.0f, 0);
             cube.Draw(e.Graphics, pen);
         }
     }
@@ -51,24 +53,55 @@ namespace Lab_1
             this.centerPoint = centerPoint;
             vertecies = new Matrix[]
             {
-                new Matrix(new float[1, 3] { { centerPoint[0] - side / 2, centerPoint[1] - side / 2,  1.0f  * side} }),
-                new Matrix(new float[1, 3] { { centerPoint[0] + side / 2, centerPoint[1] - side / 2,  1.0f  * side} }),
-                new Matrix(new float[1, 3] { { centerPoint[0] + side / 2, centerPoint[1] + side / 2,  1.0f  * side} }),
-                new Matrix(new float[1, 3] { { centerPoint[0] - side / 2, centerPoint[1] + side / 2,  1.0f  * side} }),
-                new Matrix(new float[1, 3] { { centerPoint[0] - side / 2, centerPoint[1] - side / 2, -1.0f  * side} }),
-                new Matrix(new float[1, 3] { { centerPoint[0] + side / 2, centerPoint[1] - side / 2, -1.0f  * side} }),
-                new Matrix(new float[1, 3] { { centerPoint[0] + side / 2, centerPoint[1] + side / 2, -1.0f  * side} }),
-                new Matrix(new float[1, 3] { { centerPoint[0] - side / 2, centerPoint[1] + side / 2, -1.0f  * side} })
+                new Matrix(new float[1, 4] { { centerPoint[0] - side / 2, centerPoint[1] + side / 2, centerPoint[2] + side / 2, 1 } }),
+                new Matrix(new float[1, 4] { { centerPoint[0] + side / 2, centerPoint[1] + side / 2, centerPoint[2] + side / 2, 1 } }),
+                new Matrix(new float[1, 4] { { centerPoint[0] + side / 2, centerPoint[1] - side / 2, centerPoint[2] + side / 2, 1 } }),
+                new Matrix(new float[1, 4] { { centerPoint[0] - side / 2, centerPoint[1] - side / 2, centerPoint[2] + side / 2, 1 } }),
+                new Matrix(new float[1, 4] { { centerPoint[0] - side / 2, centerPoint[1] + side / 2, centerPoint[2] - side / 2, 1 } }),
+                new Matrix(new float[1, 4] { { centerPoint[0] + side / 2, centerPoint[1] + side / 2, centerPoint[2] - side / 2, 1 } }),
+                new Matrix(new float[1, 4] { { centerPoint[0] + side / 2, centerPoint[1] - side / 2, centerPoint[2] - side / 2, 1 } }),
+                new Matrix(new float[1, 4] { { centerPoint[0] - side / 2, centerPoint[1] - side / 2, centerPoint[2] - side / 2, 1 } })
             };
 
         }
 
         public void Draw(Graphics graphics, Pen pen)
         {
-            for (int i = 0; i < 7; i += 2)
+            for (int j = 0; j < 6; ++j)
             {
-                graphics.DrawLine(pen, vertecies[indicies[0, i]][0, 0], vertecies[indicies[0, i]][0, 1],
-                    vertecies[indicies[0, i + 1]][0, 0], vertecies[indicies[0, i + 1]][0, 1]);
+                for (int i = 0; i < 7; i += 2)
+                {
+                    graphics.DrawLine(pen, vertecies[indicies[j, i]][0, 0], vertecies[indicies[j, i]][0, 1],
+                        vertecies[indicies[j, i + 1]][0, 0], vertecies[indicies[j, i + 1]][0, 1]);
+                }
+            }
+        }
+
+        public void rotationZ(double angle)
+        {
+            Matrix rotationZ = new Matrix(new float[4, 4]{
+                {   (float)Math.Cos(angle),  (float)Math.Sin(angle), 0.0f, 0.0f },
+                { -((float)Math.Sin(angle)), (float)Math.Cos(angle), 0.0f, 0.0f },
+                {  0.0f, 0.0f, 1.0f, 0.0f },
+                {  0.0f, 0.0f, 0.0f, 1.0f }
+            });
+            for (int i = 0; i < 8; ++i)
+            {
+                vertecies[i] = vertecies[i] * rotationZ;
+            }
+        }
+
+        public void translation(float l, float m, float n)
+        {
+            Matrix translation = new Matrix(new float[4, 4]{
+                {  1.0f, 0.0f, 0.0f, 0.0f },
+                {  0.0f, 1.0f, 0.0f, 0.0f },
+                {  0.0f, 0.0f, 1.0f, 0.0f },
+                {     l,    m,    n, 1.0f }
+            });
+            for (int i = 0; i < 8; ++i)
+            {
+                vertecies[i] = vertecies[i] * translation;
             }
         }
 
@@ -77,15 +110,15 @@ namespace Lab_1
             //Front face
             {0, 1, 1, 2, 2, 3, 3, 0 },
             //Back face
-            //{4, 5, 6, 7 },
-            ////Top face
-            //{3, 2, 6, 7 },
-            ////Bottom face
-            //{0, 1, 5, 4 },
-            ////Right face
-            //{1, 5, 6, 2 },
-            ////Left face
-            //{0, 4, 7, 3 }
+            {4, 5, 5, 6, 6, 7, 7, 4 },
+            //Top face
+            {3, 2, 2, 6, 6, 7, 7, 3 },
+            //Bottom face
+            {0, 1, 1, 5, 5, 4, 4, 0 },
+            //Right face
+            {1, 5, 5, 6, 6, 2, 2, 1 },
+            //Left face
+            {0, 4, 4, 7, 7, 3, 3, 0 }
         };
         private float side;
         public float Side
@@ -115,8 +148,8 @@ namespace Lab_1
 
         public Matrix(float[,] data)
         {
-            this.m = data.GetUpperBound(0) + 1;
-            this.n = data.Length;
+            m = data.GetUpperBound(0) + 1;
+            n = data.Length / m;
             this.data = data;
         }
 
@@ -142,11 +175,11 @@ namespace Lab_1
             var result = new Matrix(matrixA.M, matrixB.N);
             for (int i = 0; i < matrixA.M; ++i)
             {
-                for (int k = 0; k < matrixB.N; ++i)
+                for (int k = 0; k < matrixB.N; ++k)
                 {
-                    for (int j = 0; j < matrixA.M; ++j)
+                    for (int j = 0; j < matrixB.N; ++j)
                     {
-                        result[i, j] += matrixA[i, j] * matrixB[j, k];
+                        result[i, k] += matrixA[i, j] * matrixB[j, k];
                     }
                 }
             }
