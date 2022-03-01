@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Numerics;
+using System.Threading;
 
 namespace Lab_1
 {
@@ -29,18 +30,22 @@ namespace Lab_1
         {
 
         }
-
+        double angle = 0;
+        float offset = 0;
         private void button2_Click_1(object sender, EventArgs e)
         {
-
+            angle += 5;
+            offset += 5;
         }
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
+            pictureBox1.Invalidate();
             Cube cube = new Cube(50.0f, new int[] { pictureBox1.Width / 2, pictureBox1.Height / 2, 0 });
             Pen pen = new Pen(Brushes.Red);
-            //cube.rotationZ(45.0);
-            cube.translation(-100.0f,100.0f, 0);
+            cube.translation(offset, 0.0f, 0.0f);
+            //cube.rotationY(angle);
+            //cube.rotationZ(angle);
             cube.Draw(e.Graphics, pen);
         }
     }
@@ -53,10 +58,10 @@ namespace Lab_1
             this.centerPoint = centerPoint;
             vertecies = new Matrix[]
             {
-                new Matrix(new float[1, 4] { { centerPoint[0] - side / 2, centerPoint[1] + side / 2, centerPoint[2] + side / 2, 1 } }),
-                new Matrix(new float[1, 4] { { centerPoint[0] + side / 2, centerPoint[1] + side / 2, centerPoint[2] + side / 2, 1 } }),
-                new Matrix(new float[1, 4] { { centerPoint[0] + side / 2, centerPoint[1] - side / 2, centerPoint[2] + side / 2, 1 } }),
-                new Matrix(new float[1, 4] { { centerPoint[0] - side / 2, centerPoint[1] - side / 2, centerPoint[2] + side / 2, 1 } }),
+                new Matrix(new float[1, 4] { { centerPoint[0] - side / 2, centerPoint[1] + side / 2, centerPoint[2] + 0, 1 } }),
+                new Matrix(new float[1, 4] { { centerPoint[0] + side / 2, centerPoint[1] + side / 2, centerPoint[2] + 0, 1 } }),
+                new Matrix(new float[1, 4] { { centerPoint[0] + side / 2, centerPoint[1] - side / 2, centerPoint[2] + 0, 1 } }),
+                new Matrix(new float[1, 4] { { centerPoint[0] - side / 2, centerPoint[1] - side / 2, centerPoint[2] + 0, 1 } }),
                 new Matrix(new float[1, 4] { { centerPoint[0] - side / 2, centerPoint[1] + side / 2, centerPoint[2] - side / 2, 1 } }),
                 new Matrix(new float[1, 4] { { centerPoint[0] + side / 2, centerPoint[1] + side / 2, centerPoint[2] - side / 2, 1 } }),
                 new Matrix(new float[1, 4] { { centerPoint[0] + side / 2, centerPoint[1] - side / 2, centerPoint[2] - side / 2, 1 } }),
@@ -77,13 +82,43 @@ namespace Lab_1
             }
         }
 
+        public void ortho(double angle)
+        {
+            Matrix ortho = new Matrix(new float[4, 4]{
+                { 1, 0, 0, 0 },
+                { 0, 1, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 1 }
+            });
+            for (int i = 0; i < 8; ++i)
+            {
+                vertecies[i] = vertecies[i] * ortho;
+            }
+        }
+
+        public void rotationY(double angle)
+        {
+            angle = angle * (Math.PI / 180);
+            Matrix rotationZ = new Matrix(new float[4, 4]{
+                {    (float)Math.Cos(angle), 0, -((float)Math.Sin(angle)), 0 },
+                {                         0, 1,                         0, 0 },
+                {    (float)Math.Sin(angle), 0,    (float)Math.Cos(angle), 0 },
+                {                         0, 0,                         0, 1 }
+            });
+            for (int i = 0; i < 8; ++i)
+            {
+                vertecies[i] = vertecies[i] * rotationZ;
+            }
+        }
+
         public void rotationZ(double angle)
         {
+            angle = angle * (Math.PI / 180);
             Matrix rotationZ = new Matrix(new float[4, 4]{
-                {   (float)Math.Cos(angle),  (float)Math.Sin(angle), 0.0f, 0.0f },
-                { -((float)Math.Sin(angle)), (float)Math.Cos(angle), 0.0f, 0.0f },
-                {  0.0f, 0.0f, 1.0f, 0.0f },
-                {  0.0f, 0.0f, 0.0f, 1.0f }
+                {    (float)Math.Cos(angle), (float)Math.Sin(angle), 0, 0 },
+                { -((float)Math.Sin(angle)), (float)Math.Cos(angle), 0, 0 },
+                {                         0,                      0, 1, 0 },
+                {                         0,                      0, 0, 1 }
             });
             for (int i = 0; i < 8; ++i)
             {
@@ -94,10 +129,10 @@ namespace Lab_1
         public void translation(float l, float m, float n)
         {
             Matrix translation = new Matrix(new float[4, 4]{
-                {  1.0f, 0.0f, 0.0f, 0.0f },
-                {  0.0f, 1.0f, 0.0f, 0.0f },
-                {  0.0f, 0.0f, 1.0f, 0.0f },
-                {     l,    m,    n, 1.0f }
+                {  1, 0, 0, 0 },
+                {  0, 1, 0, 0 },
+                {  0, 0, 1, 0 },
+                {  l, m, n, 1 }
             });
             for (int i = 0; i < 8; ++i)
             {
