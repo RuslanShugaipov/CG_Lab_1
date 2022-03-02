@@ -26,26 +26,29 @@ namespace Lab_1
 
         }
 
+        double angleY = 0;
+        double angleZ = 0;
         private void button1_Click(object sender, EventArgs e)
         {
-
+            angleY += 5;
         }
-        double angle = 0;
-        float offset = 0;
+
         private void button2_Click_1(object sender, EventArgs e)
         {
-            angle += 5;
-            offset += 5;
+            angleZ += 5;
         }
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
             pictureBox1.Invalidate();
-            Cube cube = new Cube(50.0f, new int[] { pictureBox1.Width / 2, pictureBox1.Height / 2, 0 });
+            float centerX = (float)pictureBox1.Width / 2;
+            float centerY = (float)pictureBox1.Height / 2;
+            e.Graphics.TranslateTransform(centerX, centerY);
+            Cube cube = new Cube(50.0f, new int[] { 0, 0, 0 });
             Pen pen = new Pen(Brushes.Red);
-            cube.translation(offset, 0.0f, 0.0f);
-            //cube.rotationY(angle);
-            //cube.rotationZ(angle);
+            //cube.translation(offset, 0.0f, 0.0f);
+            cube.rotationY(angleY);
+            cube.rotationZ(angleZ);
             cube.Draw(e.Graphics, pen);
         }
     }
@@ -58,10 +61,10 @@ namespace Lab_1
             this.centerPoint = centerPoint;
             vertecies = new Matrix[]
             {
-                new Matrix(new float[1, 4] { { centerPoint[0] - side / 2, centerPoint[1] + side / 2, centerPoint[2] + 0, 1 } }),
-                new Matrix(new float[1, 4] { { centerPoint[0] + side / 2, centerPoint[1] + side / 2, centerPoint[2] + 0, 1 } }),
-                new Matrix(new float[1, 4] { { centerPoint[0] + side / 2, centerPoint[1] - side / 2, centerPoint[2] + 0, 1 } }),
-                new Matrix(new float[1, 4] { { centerPoint[0] - side / 2, centerPoint[1] - side / 2, centerPoint[2] + 0, 1 } }),
+                new Matrix(new float[1, 4] { { centerPoint[0] - side / 2, centerPoint[1] + side / 2, centerPoint[2] + side / 2, 1 } }),
+                new Matrix(new float[1, 4] { { centerPoint[0] + side / 2, centerPoint[1] + side / 2, centerPoint[2] + side / 2, 1 } }),
+                new Matrix(new float[1, 4] { { centerPoint[0] + side / 2, centerPoint[1] - side / 2, centerPoint[2] + side / 2, 1 } }),
+                new Matrix(new float[1, 4] { { centerPoint[0] - side / 2, centerPoint[1] - side / 2, centerPoint[2] + side / 2, 1 } }),
                 new Matrix(new float[1, 4] { { centerPoint[0] - side / 2, centerPoint[1] + side / 2, centerPoint[2] - side / 2, 1 } }),
                 new Matrix(new float[1, 4] { { centerPoint[0] + side / 2, centerPoint[1] + side / 2, centerPoint[2] - side / 2, 1 } }),
                 new Matrix(new float[1, 4] { { centerPoint[0] + side / 2, centerPoint[1] - side / 2, centerPoint[2] - side / 2, 1 } }),
@@ -159,7 +162,7 @@ namespace Lab_1
         public float Side
         {
             get { return side; }
-            set { this.side = value; }
+            set { side = value; }
         }
         private Matrix[] vertecies;
         private int[] centerPoint;
@@ -192,7 +195,7 @@ namespace Lab_1
         {
             this.m = m;
             this.n = n;
-            this.data = new float[m, n];
+            data = new float[m, n];
         }
 
         public float this[int x, int y]
